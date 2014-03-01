@@ -7,27 +7,27 @@
 // Please don't abuse this.
 var readability_token = '172b057cd7cfccf27b60a36f16b1acde12783893';
 
-function create_spritz(){
+function create_spritz() {
 
-     spritz_loader = function() {
+   spritz_loader = function() {
 
-        $.get("https://rawgithub.com/Miserlou/OpenSpritz/master/spritz.html",function(data){
+    $.get("https://rawgithub.com/Miserlou/OpenSpritz/master/spritz.html",function(data) {
 
-            console.log("Got data..");
+        console.log("Got data..");
 
-            if (!($("#spritz_container").length) ) {
-                console.log("Prepending data..");
-                $("body").prepend(data);
-            }
+        if (!($("#spritz_container").length) ) {
+            console.log("Prepending data..");
+            $("body").prepend(data);
+        }
 
-        },'html');
-    };
+    },'html');
+};
 
-    load_jq(spritz_loader);
+load_jq(spritz_loader);
 
 }
 
-function load_jq(spritz_loader){
+function load_jq(spritz_loader) {
     // jQuery loader: http://coding.smashingmagazine.com/2010/05/23/make-your-own-bookmarklets-with-jquery/
 
     // the minimum version of jQuery we want
@@ -35,46 +35,47 @@ function load_jq(spritz_loader){
 
     // check prior inclusion and version
     if (window.jQuery === undefined || window.jQuery.fn.jquery < v) {
-      var done = false;
-      var script = document.createElement("script");
-      script.src = "https://ajax.googleapis.com/ajax/libs/jquery/" + v + "/jquery.min.js";
-      script.onload = script.onreadystatechange = function(){
-        if (!done && (!this.readyState || this.readyState == "loaded" || this.readyState == "complete")) {
-          done = true;
-          spritz_loader();
-        }
-      };
-      document.getElementsByTagName("head")[0].appendChild(script);
-    } else{
+        var done = false;
+        var script = document.createElement("script");
+        script.src = "https://ajax.googleapis.com/ajax/libs/jquery/" + v + "/jquery.min.js";
+        script.onload = script.onreadystatechange = function() {
+            if (!done && (!this.readyState || this.readyState == "loaded" || this.readyState == "complete")) {
+              done = true;
+              spritz_loader();
+            }
+        };
+        document.getElementsByTagName("head")[0].appendChild(script);
+    }
+    else {
         spritz_loader();
     }
 }
 
-function hide_spritz(){
+function hide_spritz() {
     $('#spritz_spacer').slideUp();
     $('#spritz_container').slideUp();
     $('#spritz_holder').slideUp();
 }
 
 // Entry point
-function spritz(){
+function spritz() {
 
     var wpm = parseInt($("#spritz_selector").val(), 10);
-    if(wpm < 1){
+    if(wpm < 1) {
         return;
     }
 
     var selection = getSelectionText();
-    if(selection){
+    if(selection) {
         spritzify(selection);
     }
-    else{
+    else {
         spritzifyURL();
     }
 }
 
 // The meat!
-function spritzify(input){
+function spritzify(input) {
 
     var wpm = parseInt($("#spritz_selector").val(), 10);
     var ms_per_word = 60000/wpm;
@@ -89,14 +90,14 @@ function spritzify(input){
     var temp_words = all_words.slice(0); // copy Array
     var t = 0;
 
-    for (var i=0; i<all_words.length; i++){
+    for (var i=0; i<all_words.length; i++) {
 
-        if(all_words[i].indexOf('.') != -1){
+        if(all_words[i].indexOf('.') != -1) {
             temp_words[t] = all_words[i].replace('.', '•');
         }
 
         // Double up on long words and words with commas.
-        if((all_words[i].indexOf(',') != -1 || all_words[i].indexOf(':') != -1 || all_words[i].indexOf('-') != -1 || all_words[i].indexOf('(') != -1|| all_words[i].length > 8) && all_words[i].indexOf('.') == -1){
+        if((all_words[i].indexOf(',') != -1 || all_words[i].indexOf(':') != -1 || all_words[i].indexOf('-') != -1 || all_words[i].indexOf('(') != -1|| all_words[i].length > 8) && all_words[i].indexOf('.') == -1) {
             temp_words.splice(t+1, 0, all_words[i]);
             temp_words.splice(t+1, 0, all_words[i]);
             t++;
@@ -104,7 +105,7 @@ function spritzify(input){
         }
 
         // Add an additional space after punctuation.
-        if(all_words[i].indexOf('.') != -1 || all_words[i].indexOf('!') != -1 || all_words[i].indexOf('?') != -1 || all_words[i].indexOf(':') != -1 || all_words[i].indexOf(';') != -1|| all_words[i].indexOf(')') != -1){
+        if(all_words[i].indexOf('.') != -1 || all_words[i].indexOf('!') != -1 || all_words[i].indexOf('?') != -1 || all_words[i].indexOf(':') != -1 || all_words[i].indexOf(';') != -1|| all_words[i].indexOf(')') != -1) {
             temp_words.splice(t+1, 0, ".");
             temp_words.splice(t+1, 0, ".");
             temp_words.splice(t+1, 0, ".");
@@ -112,37 +113,34 @@ function spritzify(input){
             t++;
             t++;
         }
-
         t++;
-
     }
     all_words = temp_words.slice(0);
 
     // Set the timers!
-    for (var i=0; i<all_words.length; i++){
+    for (var i=0; i<all_words.length; i++) {
         setTimeout(function(x) { 
             return function() { 
-
                 var p = pivot(all_words[x]);
                 $('#spritz_result').html(p);
 
-        }; }(i), ms_per_word * i);
-        
+            };
+        }(i), ms_per_word * i);
     }
 }
 
 // Find the red-character of the current word.
-function pivot(word){
+function pivot(word) {
     var length = word.length;
 
-    if(length<6){
+    if(length<6) {
 
         var bit = 1;
-        while(word.length < 22){
-            if(bit > 0){
+        while(word.length < 22) {
+            if(bit > 0) {
                 word = word + '.';
             }
-            else{
+            else {
                 word = '.' + word;
             }
             bit = bit * -1;
@@ -150,10 +148,11 @@ function pivot(word){
 
         var start = '';
         var end = '';
-        if((length % 2) === 0){
+        if((length % 2) === 0) {
             start = word.slice(0, word.length/2);
             end = word.slice(word.length/2, word.length);
-        } else{
+        }
+        else {
             start = word.slice(0, word.length/2);
             end = word.slice(word.length/2, word.length);
         }
@@ -166,8 +165,7 @@ function pivot(word){
         result = result + end;
         result = result + "</span>";
     }
-
-    else{
+    else {
 
         var tail = 22 - (word.length + 7);
         word = '.......' + word + ('.'.repeat(tail));
@@ -182,11 +180,9 @@ function pivot(word){
         result = result + "</span><span class='end'>";
         result = result + end;
         result = result + "</span>";
-
     }
 
     result = result.replace(/\./g, "<span class='invisible'>.</span>");
-
     return result;
 }
 
@@ -203,37 +199,37 @@ function getSelectionText() {
             }
             text = container.innerText || container.textContent;
         }
-    } else if (typeof document.selection != "undefined") {
+    }
+    else if (typeof document.selection != "undefined") {
         if (document.selection.type == "Text") {
             text = document.selection.createRange().text;
         }
     }
-    if(text === ""){
+    if(text === "") {
         return false;
     }
-    else{
+    else {
         return text;
     }
 }
 
 // Uses the Readability API to get the juicy content of the current page.
-function spritzifyURL(){
+function spritzifyURL() {
     var url = document.URL;
     // var url = "http://www.theguardian.com/world/2014/feb/27/gchq-nsa-webcam-images-internet-yahoo";
     // var url = "http://www.gq.com/sports/profiles/201202/david-diamante-interview-cigar-lounge-brooklyn-new-jersey-nets?currentPage=all";
 
     $.getJSON("https://www.readability.com/api/content/v1/parser?url="+ url +"&token=" + readability_token +"&callback=?",
-    function (data) {
+        function (data) {
+            var title = '';
+            if(data.title !== "") {
+                title = data.title + ". ";
+            }
 
-        var title = '';
-        if(data.title !== ""){
-            title = data.title + ". ";
-        }
-
-        var author = '';
-        if(data.author !== null){
-            author = "By " + data.author + ". ";
-        }
+            var author = '';
+            if(data.author !== null) {
+                author = "By " + data.author + ". ";
+            }
 
         var body = jQuery(data.content).text(); // Textify HTML content.
         body = $.trim(body); // Trip trailing and leading whitespace.
@@ -245,7 +241,6 @@ function spritzifyURL(){
         text_content = text_content.replace(/\!/g, '! ');
         spritzify(text_content);
     });
-
 }
 
 //////
@@ -253,7 +248,7 @@ function spritzifyURL(){
 //////
 
 // This is a hack using the fact that browers sequentially id the timers.
-function clearTimeouts(){
+function clearTimeouts() {
     var id = window.setTimeout(function() {}, 0);
 
     while (id--) {
@@ -263,7 +258,6 @@ function clearTimeouts(){
 
 // Let strings repeat themselves,
 // because JavaScript isn't as awesome as Python.
-String.prototype.repeat = function( num ){
+String.prototype.repeat = function( num ) {
     return new Array( num + 1 ).join( this );
 }
-
